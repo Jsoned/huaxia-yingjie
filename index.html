@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>华夏英杰传 - 三路MOBA版</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+body { overflow: hidden; background: #0a0a0a; font-family: "Microsoft YaHei", "SimSun", sans-serif; }
+#gameContainer { position: relative; width: 100vw; height: 100vh; }
+#canvas3d { display: block; width: 100%; height: 100%; }
+#loginScreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a1a; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
+#loginCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.loginPanel { position: relative; z-index: 10; width: 420px; padding: 40px; background: rgba(20, 10, 5, 0.92); border: 3px solid #d4a843; border-radius: 8px; box-shadow: 0 0 40px rgba(212, 168, 67, 0.3), inset 0 0 60px rgba(0,0,0,0.5); }
+.loginPanel::before { content: ""; position: absolute; top: -6px; left: -6px; right: -6px; bottom: -6px; border: 1px solid rgba(212, 168, 67, 0.3); border-radius: 12px; pointer-events: none; }
+.loginTitle { text-align: center; font-size: 36px; color: #d4a843; margin-bottom: 30px; font-family: "SimSun", "KaiTi", serif; text-shadow: 0 0 20px rgba(212, 168, 67, 0.5); letter-spacing: 8px; }
+.loginInput { width: 100%; padding: 14px 18px; margin-bottom: 18px; background: rgba(60, 40, 20, 0.6); border: 2px solid #8b6914; border-radius: 4px; color: #f0e6d2; font-size: 16px; outline: none; transition: all 0.3s; }
+.loginInput:focus { border-color: #d4a843; box-shadow: 0 0 15px rgba(212, 168, 67, 0.3); }
+.loginBtn { width: 100%; padding: 14px; margin-top: 10px; background: #c41e3a; color: #fff; border: none; font-size: 20px; cursor: pointer; border-radius: 4px; font-family: "SimSun", serif; letter-spacing: 6px; transition: all 0.3s; }
+.loginBtn:hover { background: #d42a4a; box-shadow: 0 0 25px rgba(196, 30, 58, 0.5); transform: translateY(-2px); }
+#mainMenu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0a; display: none; z-index: 900; }
+#menuBgCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.menuLeft { position: absolute; left: 60px; top: 50%; transform: translateY(-50%); z-index: 10; }
+.menuItem { padding: 18px 30px; margin: 12px 0; color: #d4a843; font-size: 24px; cursor: pointer; font-family: "SimSun", "KaiTi", serif; letter-spacing: 4px; border-left: 4px solid transparent; transition: all 0.3s; }
+.menuItem:hover { border-left-color: #c41e3a; padding-left: 40px; text-shadow: 0 0 15px rgba(212, 168, 67, 0.6); }
+.menuCenter { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 10; text-align: center; }
+.heroShowcase { width: 300px; height: 400px; background: rgba(20, 10, 5, 0.7); border: 2px solid #d4a843; border-radius: 8px; margin-bottom: 20px; position: relative; }
+.heroShowcaseName { color: #d4a843; font-size: 28px; margin-top: 15px; font-family: "SimSun", serif; }
+.menuRight { position: absolute; right: 60px; top: 50%; transform: translateY(-50%); z-index: 10; width: 220px; }
+.playerInfo { background: rgba(20, 10, 5, 0.85); border: 2px solid #8b6914; border-radius: 8px; padding: 20px; color: #f0e6d2; }
+.playerInfo h3 { color: #d4a843; font-size: 20px; margin-bottom: 15px; text-align: center; font-family: "SimSun", serif; }
+.infoRow { display: flex; justify-content: space-between; margin: 10px 0; font-size: 14px; }
+.infoLabel { color: #8b6914; }
+.infoValue { color: #d4a843; }
+#heroSelect { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a1a; display: none; z-index: 800; }
+.heroSelectLeft { position: absolute; left: 0; top: 0; width: 280px; height: 100%; background: rgba(10, 5, 0, 0.95); overflow-y: auto; padding: 20px; border-right: 2px solid #8b6914; }
+.heroCard { display: flex; align-items: center; padding: 10px; margin: 8px 0; background: rgba(40, 25, 10, 0.7); border: 1px solid #5a4014; border-radius: 6px; cursor: pointer; transition: all 0.3s; }
+.heroCard:hover, .heroCard.selected { border-color: #d4a843; background: rgba(80, 55, 20, 0.7); box-shadow: 0 0 15px rgba(212, 168, 67, 0.2); }
+.heroCardIcon { width: 48px; height: 48px; margin-right: 12px; border-radius: 4px; }
+.heroCardName { color: #f0e6d2; font-size: 16px; }
+.heroCardType { color: #8b6914; font-size: 12px; }
+.heroSelectCenter { position: absolute; left: 280px; right: 320px; top: 0; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; }
+.heroDisplay { width: 350px; height: 450px; background: rgba(20, 10, 5, 0.8); border: 2px solid #d4a843; border-radius: 10px; position: relative; overflow: hidden; }
+.heroStats { margin-top: 30px; width: 100%; max-width: 500px; }
+.statRow { display: flex; align-items: center; margin: 10px 0; }
+.statName { width: 80px; color: #d4a843; font-size: 14px; }
+.statBar { flex: 1; height: 14px; background: rgba(0,0,0,0.5); border-radius: 7px; overflow: hidden; margin: 0 10px; }
+.statFill { height: 100%; border-radius: 7px; transition: width 0.5s; }
+.statValue { width: 40px; color: #f0e6d2; font-size: 14px; text-align: right; }
+.heroSelectRight { position: absolute; right: 0; top: 0; width: 320px; height: 100%; background: rgba(10, 5, 0, 0.95); padding: 30px; border-left: 2px solid #8b6914; overflow-y: auto; }
+.skillScroll { background: rgba(30, 20, 10, 0.8); border: 1px solid #5a4014; border-radius: 8px; padding: 15px; margin: 15px 0; }
+.skillScroll h4 { color: #d4a843; margin-bottom: 10px; font-family: "SimSun", serif; }
+.skillScroll p { color: #c0b090; font-size: 14px; line-height: 1.6; }
+.selectBtn { width: 100%; padding: 15px; margin-top: 20px; background: #c41e3a; color: #fff; border: none; font-size: 18px; cursor: pointer; border-radius: 4px; font-family: "SimSun", serif; letter-spacing: 4px; }
+.selectBtn:hover { background: #d42a4a; }
+#mapSelect { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 5, 0, 0.95); display: none; z-index: 750; flex-direction: column; align-items: center; justify-content: center; }
+.mapSelectTitle { color: #d4a843; font-size: 32px; font-family: "SimSun", "KaiTi", serif; margin-bottom: 30px; letter-spacing: 6px; text-shadow: 0 0 20px rgba(212, 168, 67, 0.5); }
+.mapCards { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+.mapCard { width: 220px; height: 320px; background: rgba(20, 10, 5, 0.9); border: 2px solid #5a4014; border-radius: 12px; cursor: pointer; transition: all 0.3s; overflow: hidden; position: relative; }
+.mapCard:hover, .mapCard.selected { border-color: #d4a843; box-shadow: 0 0 30px rgba(212, 168, 67, 0.3); transform: translateY(-5px); }
+.mapCardPreview { width: 100%; height: 170px; display: flex; align-items: center; justify-content: center; }
+.mapCardName { color: #d4a843; font-size: 20px; text-align: center; font-family: "SimSun", serif; margin: 10px 0; }
+.mapCardDesc { color: #c0b090; font-size: 13px; text-align: center; padding: 0 12px; line-height: 1.5; }
+.mapCardTag { position: absolute; top: 10px; right: 10px; background: #c41e3a; color: #fff; font-size: 12px; padding: 4px 10px; border-radius: 4px; }
+.mapSelectBtn { padding: 15px 60px; background: #c41e3a; color: #fff; border: none; font-size: 20px; cursor: pointer; border-radius: 4px; font-family: "SimSun", serif; letter-spacing: 6px; transition: all 0.3s; }
+.mapSelectBtn:hover { background: #d42a4a; }
+.mapSelectBtn:disabled { background: #555; cursor: not-allowed; }
+.difficultySelect { display: flex; gap: 15px; margin-bottom: 25px; }
+.diffBtn { padding: 12px 30px; background: rgba(40, 25, 10, 0.7); border: 2px solid #5a4014; color: #c0b090; font-size: 16px; cursor: pointer; border-radius: 6px; transition: all 0.3s; font-family: "SimSun", serif; letter-spacing: 2px; }
+.diffBtn:hover { border-color: #d4a843; color: #d4a843; }
+.diffBtn.selected { border-color: #d4a843; background: rgba(212, 168, 67, 0.2); color: #d4a843; box-shadow: 0 0 15px rgba(212, 168, 67, 0.3); }
+.diffBtn[data-diff="easy"] { border-color: #4a9b5e; }
+.diffBtn[data-diff="easy"].selected { background: rgba(74, 155, 94, 0.2); color: #4a9b5e; border-color: #4a9b5e; }
+.diffBtn[data-diff="hard"] { border-color: #ff8c00; }
+.diffBtn[data-diff="hard"].selected { background: rgba(255, 140, 0, 0.2); color: #ff8c00; border-color: #ff8c00; }
+.diffBtn[data-diff="nightmare"] { border-color: #c41e3a; }
+.diffBtn[data-diff="nightmare"].selected { background: rgba(196, 30, 58, 0.2); color: #c41e3a; border-color: #c41e3a; }
+.modeSelect { display: flex; gap: 15px; margin-bottom: 25px; }
+.modeBtn { padding: 12px 30px; background: rgba(40, 25, 10, 0.7); border: 2px solid #5a4014; color: #c0b090; font-size: 16px; cursor: pointer; border-radius: 6px; transition: all 0.3s; font-family: "SimSun", serif; letter-spacing: 2px; }
+.modeBtn:hover { border-color: #d4a843; color: #d4a843; }
+.modeBtn.selected { border-color: #d4a843; background: rgba(212, 168, 67, 0.2); color: #d4a843; box-shadow: 0 0 15px rgba(212, 168, 67, 0.3); }
+#gameHUD { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display: none; z-index: 500; }
+.hpMpBars { position: absolute; bottom: 30px; left: 30px; width: 280px; }
+.barContainer { margin: 8px 0; position: relative; }
+.barLabel { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #fff; font-size: 12px; font-weight: bold; z-index: 2; text-shadow: 0 0 4px rgba(0,0,0,0.8); }
+.barBg { width: 100%; height: 24px; background: rgba(0,0,0,0.7); border-radius: 12px; overflow: hidden; border: 2px solid; }
+.hpBar { border-color: #d4a843; }
+.hpFill { height: 100%; background: linear-gradient(90deg, #8b0000, #c41e3a, #ff4444); border-radius: 10px; transition: width 0.3s; }
+.mpBar { border-color: #8a9baa; }
+.mpFill { height: 100%; background: linear-gradient(90deg, #003366, #0066cc, #00a8cc); border-radius: 10px; transition: width 0.3s; }
+.xpBar { width: 100%; height: 6px; background: rgba(0,0,0,0.7); border-radius: 3px; overflow: hidden; margin-top: 5px; }
+.xpFill { height: 100%; background: linear-gradient(90deg, #b8860b, #d4a843, #ffd700); border-radius: 3px; transition: width 0.3s; }
+.barText { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #fff; font-size: 11px; z-index: 2; text-shadow: 0 0 4px rgba(0,0,0,0.8); }
+.skillBar { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; }
+.skillSlot { width: 64px; height: 64px; background: rgba(0,0,0,0.7); border: 2px solid #5a4014; border-radius: 50%; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.skillSlot.active { border-color: #d4a843; box-shadow: 0 0 15px rgba(212, 168, 67, 0.4); }
+.skillSlot .skillIcon { width: 50px; height: 50px; border-radius: 50%; }
+.skillSlot .cooldown { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px; font-weight: bold; }
+.skillSlot .keyHint { position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); color: #d4a843; font-size: 12px; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 3px; }
+.minimap { position: absolute; bottom: 30px; right: 30px; width: 200px; height: 200px; background: rgba(0, 20, 10, 0.85); border: 2px solid #d4a843; border-radius: 50%; overflow: hidden; }
+.minimap canvas { width: 100%; height: 100%; }
+.equipBar { position: absolute; bottom: 120px; left: 30px; display: flex; gap: 6px; }
+.equipSlot { width: 48px; height: 48px; background: rgba(0,0,0,0.6); border: 1px solid #5a4014; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #d4a843; font-size: 14px; font-weight: bold; }
+.killFeed { position: absolute; top: 80px; right: 30px; text-align: right; }
+.killMsg { color: #d4a843; font-size: 18px; margin: 5px 0; text-shadow: 0 0 10px rgba(212, 168, 67, 0.5); animation: killFade 3s forwards; }
+@keyframes killFade { 0% { opacity: 1; transform: translateX(0); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateX(-30px); } }
+.lockHint { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #d4a843; font-size: 24px; font-family: "SimSun", serif; text-shadow: 0 0 20px rgba(212, 168, 67, 0.6); opacity: 0; transition: opacity 0.5s; pointer-events: none; background: rgba(0,0,0,0.6); padding: 10px 30px; border-radius: 8px; }
+.lockHint.show { opacity: 1; }
+#scoreboard { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 600px; background: rgba(10, 5, 0, 0.95); border: 2px solid #d4a843; border-radius: 8px; padding: 30px; display: none; pointer-events: auto; }
+.scoreTitle { color: #d4a843; font-size: 24px; text-align: center; margin-bottom: 20px; font-family: "SimSun", serif; }
+.scoreTable { width: 100%; color: #f0e6d2; }
+.scoreTable th { color: #d4a843; padding: 10px; border-bottom: 1px solid #5a4014; }
+.scoreTable td { padding: 8px 10px; text-align: center; }
+#pauseMenu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; pointer-events: auto; z-index: 600; }
+.pausePanel { width: 400px; background: rgba(20, 10, 5, 0.95); border: 2px solid #d4a843; border-radius: 8px; padding: 40px; }
+.pauseTitle { color: #d4a843; font-size: 28px; text-align: center; margin-bottom: 30px; font-family: "SimSun", serif; }
+.pauseBtn { width: 100%; padding: 14px; margin: 10px 0; background: #c41e3a; color: #fff; border: none; font-size: 18px; cursor: pointer; border-radius: 4px; font-family: "SimSun", serif; }
+.pauseBtn:hover { background: #d42a4a; }
+#bigMap { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 600px; height: 600px; background: rgba(0, 20, 10, 0.9); border: 3px solid #d4a843; border-radius: 8px; display: none; pointer-events: auto; z-index: 550; }
+#bigMap canvas { width: 100%; height: 100%; border-radius: 8px; }
+.hintText { position: absolute; bottom: 200px; left: 50%; transform: translateX(-50%); color: #d4a843; font-size: 16px; background: rgba(0,0,0,0.6); padding: 8px 20px; border-radius: 4px; display: none; }
+#keyHintPanel { position: absolute; top: 20px; right: 20px; background: rgba(10, 5, 0, 0.85); border: 1px solid #5a4014; border-radius: 8px; padding: 15px; color: #f0e6d2; font-size: 13px; z-index: 520; pointer-events: none; transition: opacity 0.3s; }
+#keyHintPanel.hidden { opacity: 0; }
+.keyHintTitle { color: #d4a843; font-size: 14px; margin-bottom: 10px; text-align: center; font-family: "SimSun", serif; border-bottom: 1px solid #5a4014; padding-bottom: 6px; }
+.keyHintRow { display: flex; align-items: center; margin: 5px 0; }
+.keyHintKey { background: rgba(60, 40, 20, 0.8); border: 1px solid #8b6914; border-radius: 4px; padding: 2px 8px; color: #d4a843; font-size: 12px; margin-right: 10px; min-width: 50px; text-align: center; }
+.keyHintDesc { color: #c0b090; font-size: 12px; }
+.keyHintToggle { position: absolute; top: 5px; right: 8px; color: #8b6914; font-size: 11px; cursor: pointer; pointer-events: auto; }
+#loadingScreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 5, 0, 0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 3000; }
+.loadingTitle { color: #d4a843; font-size: 28px; font-family: "SimSun", "KaiTi", serif; margin-bottom: 30px; letter-spacing: 4px; }
+.loadingBarContainer { width: 400px; height: 20px; background: rgba(60, 40, 20, 0.6); border: 1px solid #8b6914; border-radius: 10px; overflow: hidden; }
+.loadingBar { width: 0%; height: 100%; background: linear-gradient(90deg, #8b0000, #c41e3a, #d4a843); border-radius: 10px; transition: width 0.3s; }
+.loadingText { color: #c0b090; font-size: 14px; margin-top: 15px; }
+#tutorialOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2500; display: none; pointer-events: auto; }
+.tutorialBox { position: absolute; background: rgba(20, 10, 5, 0.95); border: 2px solid #d4a843; border-radius: 12px; padding: 25px; max-width: 400px; box-shadow: 0 0 30px rgba(212, 168, 67, 0.3); }
+.tutorialBox h3 { color: #d4a843; font-size: 20px; margin-bottom: 12px; font-family: "SimSun", serif; }
+.tutorialBox p { color: #f0e6d2; font-size: 15px; line-height: 1.8; margin-bottom: 15px; }
+.tutorialBtn { padding: 10px 30px; background: #c41e3a; color: #fff; border: none; font-size: 16px; cursor: pointer; border-radius: 4px; font-family: "SimSun", serif; letter-spacing: 2px; }
+.tutorialBtn:hover { background: #d42a4a; }
+.tutorialHighlight { position: absolute; border: 3px solid #d4a843; border-radius: 8px; box-shadow: 0 0 20px rgba(212, 168, 67, 0.5); pointer-events: none; animation: highlightPulse 1.5s infinite; }
+@keyframes highlightPulse { 0%, 100% { box-shadow: 0 0 20px rgba(212, 168, 67, 0.5); } 50% { box-shadow: 0 0 40px rgba(212, 168, 67, 0.8); } }
+#onlineLobby { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 5, 0, 0.95); z-index: 850; display: none; flex-direction: column; }
+.lobbyHeader { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 2px solid #5a4014; }
+.lobbyTitle { color: #d4a843; font-size: 28px; font-family: "SimSun", "KaiTi", serif; }
+.lobbyBackBtn { padding: 8px 20px; background: rgba(212,168,67,0.2); border: 1px solid #d4a843; color: #d4a843; border-radius: 4px; cursor: pointer; font-size: 14px; }
+.lobbyBody { display: flex; flex: 1; padding: 20px 40px; gap: 20px; }
+.lobbyLeft { width: 300px; background: rgba(20, 10, 5, 0.9); border: 1px solid #5a4014; border-radius: 8px; padding: 20px; }
+.lobbyLeft h3 { color: #d4a843; margin-bottom: 15px; font-family: "SimSun", serif; }
+.lobbyInput { width: 100%; padding: 10px; margin-bottom: 12px; background: rgba(60, 40, 20, 0.6); border: 1px solid #8b6914; border-radius: 4px; color: #f0e6d2; font-size: 14px; }
+.lobbyBtn { width: 100%; padding: 12px; margin-bottom: 10px; background: #c41e3a; color: #fff; border: none; font-size: 16px; cursor: pointer; border-radius: 4px; font-family: "SimSun", serif; }
+.lobbyBtn:hover { background: #d42a4a; }
+.lobbyBtn.secondary { background: #8b6914; }
+.lobbyBtn.secondary:hover { background: #a08020; }
+.lobbyCenter { flex: 1; background: rgba(20, 10, 5, 0.9); border: 1px solid #5a4014; border-radius: 8px; padding: 20px; overflow-y: auto; }
+.lobbyCenter h3 { color: #d4a843; margin-bottom: 15px; font-family: "SimSun", serif; }
+.roomListItem { display: flex; justify-content: space-between; align-items: center; padding: 12px; margin: 8px 0; background: rgba(40, 25, 10, 0.6); border: 1px solid #5a4014; border-radius: 6px; cursor: pointer; transition: all 0.3s; }
+.roomListItem:hover { border-color: #d4a843; }
+.roomListItem.selected { border-color: #d4a843; background: rgba(80, 55, 20, 0.7); }
+.roomName { color: #f0e6d2; font-size: 15px; }
+.roomInfo { color: #8b6914; font-size: 12px; }
+.lobbyRight { width: 300px; background: rgba(20, 10, 5, 0.9); border: 1px solid #5a4014; border-radius: 8px; padding: 20px; display: flex; flex-direction: column; }
+.lobbyRight h3 { color: #d4a843; margin-bottom: 15px; font-family: "SimSun", serif; }
+.chatBox { flex: 1; background: rgba(10, 5, 0, 0.8); border: 1px solid #5a4014; border-radius: 6px; padding: 10px; overflow-y: auto; margin-bottom: 10px; max-height: 300px; }
+.chatMsg { color: #c0b090; font-size: 13px; margin: 4px 0; }
+.chatMsg .chatName { color: #d4a843; }
+.chatMsg .chatSystem { color: #8b6914; font-style: italic; }
+.chatInputRow { display: flex; gap: 8px; }
+.chatInput { flex: 1; padding: 8px; background: rgba(60, 40, 20, 0.6); border: 1px solid #8b6914; border-radius: 4px; color: #f0e6d2; font-size: 13px; }
+.chatSendBtn { padding: 8px 16px; background: #8b6914; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
+.playerList { margin-top: 15px; }
+.playerListItem { display: flex; align-items: center; gap: 10px; padding: 8px; margin: 5px 0; background: rgba(40, 25, 10, 0.4); border-radius: 4px; }
+.playerStatus { width: 10px; height: 10px; border-radius: 50%; background: #c41e3a; }
+.playerStatus.ready { background: #4a9b5e; }
+.playerListName { color: #f0e6d2; font-size: 14px; }
+.connectionStatus { position: absolute; bottom: 20px; left: 40px; color: #8b6914; font-size: 12px; }
+#recallBarContainer { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 200px; height: 24px; background: rgba(0,0,0,0.7); border: 2px solid #d4a843; border-radius: 12px; overflow: hidden; display: none; z-index: 510; }
+#recallBarFill { width: 0%; height: 100%; background: linear-gradient(90deg, #d4a843, #ffd700); transition: width 0.1s linear; }
+#recallBarText { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; font-size: 12px; font-weight: bold; text-shadow: 0 0 4px rgba(0,0,0,0.8); }
+#shopPanel { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; background: rgba(10, 5, 0, 0.95); border: 2px solid #d4a843; border-radius: 8px; padding: 30px; display: none; pointer-events: auto; z-index: 560; }
+.shopTitle { color: #d4a843; font-size: 24px; text-align: center; margin-bottom: 20px; font-family: "SimSun", serif; }
+.shopItem { display: flex; align-items: center; padding: 12px; margin: 8px 0; background: rgba(40, 25, 10, 0.6); border: 1px solid #5a4014; border-radius: 6px; cursor: pointer; transition: all 0.3s; }
+.shopItem:hover { border-color: #d4a843; background: rgba(80, 55, 20, 0.7); }
+.shopItemName { color: #d4a843; font-size: 16px; flex: 1; }
+.shopItemStat { color: #c0b090; font-size: 13px; margin: 0 10px; }
+.shopItemPrice { color: #ffd700; font-size: 16px; font-weight: bold; }
+.shopCloseBtn { width: 100%; padding: 12px; margin-top: 15px; background: #c41e3a; color: #fff; border: none; font-size: 16px; cursor: pointer; border-radius: 4px; font-family: "SimSun", serif; }
+.shopCloseBtn:hover { background: #d42a4a; }
+.shopGold { color: #ffd700; font-size: 18px; text-align: center; margin-bottom: 15px; }
+#respawnCountdown { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); color: #ff4444; font-size: 32px; font-family: "SimSun", serif; text-shadow: 0 0 20px rgba(255, 68, 68, 0.8); display: none; z-index: 515; pointer-events: none; }
+#playerGold { position: absolute; top: 20px; left: 30px; color: #ffd700; font-size: 18px; font-weight: bold; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); z-index: 510; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="gameContainer">
+<canvas id="canvas3d"></canvas>
+<div id="loginScreen"><canvas id="loginCanvas"></canvas><div class="loginPanel"><div class="loginTitle">华夏英杰传</div><input type="text" class="loginInput" id="username" placeholder="请输入您的名号" maxlength="12"><input type="password" class="loginInput" id="password" placeholder="请输入密钥" maxlength="16"><button class="loginBtn" id="loginBtn">踏入江湖</button></div></div>
+<div id="mainMenu"><canvas id="menuBgCanvas"></canvas><div class="menuLeft"><div class="menuItem" data-action="play">开始征战</div><div class="menuItem" data-action="online">联机对战</div><div class="menuItem" data-action="hero">英雄图鉴</div><div class="menuItem" data-action="settings">游戏设置</div><div class="menuItem" data-action="help">操作指南</div><div class="menuItem" data-action="exit">退出游戏</div></div><div class="menuCenter"><div class="heroShowcase" id="heroShowcase"><canvas id="showcaseCanvas" width="300" height="400"></canvas></div><div class="heroShowcaseName" id="showcaseName">秦始皇</div></div><div class="menuRight"><div class="playerInfo"><h3>玩家信息</h3><div class="infoRow"><span class="infoLabel">名号</span><span class="infoValue" id="playerName">--</span></div><div class="infoRow"><span class="infoLabel">等级</span><span class="infoValue" id="playerLevel">1</span></div><div class="infoRow"><span class="infoLabel">胜场</span><span class="infoValue" id="playerWins">0</span></div><div class="infoRow"><span class="infoLabel">英杰</span><span class="infoValue" id="heroCount">0/50</span></div></div></div></div>
+<div id="heroSelect"><div class="heroSelectLeft" id="heroList"></div><div class="heroSelectCenter"><div class="heroDisplay" id="heroDisplay"><canvas id="heroDisplayCanvas" width="350" height="450"></canvas></div><div class="heroStats" id="heroStats"></div><button class="selectBtn" id="confirmSelect">确认选择</button></div><div class="heroSelectRight" id="skillPanel"></div></div>
+<div id="mapSelect"><div class="mapSelectTitle">选择战场</div><div class="mapCards" id="mapCardsContainer"></div><div class="modeSelect"><div class="modeBtn selected" data-mode="3v3">3v3 对战</div><div class="modeBtn" data-mode="5v5">5v5 团战</div></div><div class="difficultySelect"><div class="diffBtn" data-diff="easy">简单</div><div class="diffBtn selected" data-diff="normal">普通</div><div class="diffBtn" data-diff="hard">困难</div><div class="diffBtn" data-diff="nightmare">噩梦</div></div><button class="mapSelectBtn" id="confirmMap" disabled>进入战场</button></div>
+<div id="onlineLobby"><div class="lobbyHeader"><div class="lobbyTitle">联机大厅</div><button class="lobbyBackBtn" id="lobbyBack">返回主菜单</button></div><div class="lobbyBody"><div class="lobbyLeft"><h3>房间操作</h3><input type="text" class="lobbyInput" id="roomNameInput" placeholder="房间名称"><input type="text" class="lobbyInput" id="playerNameInput" placeholder="您的名号"><button class="lobbyBtn" id="createRoomBtn">创建房间</button><button class="lobbyBtn secondary" id="joinRoomBtn">加入选中房间</button><button class="lobbyBtn secondary" id="readyBtn">准备 / 取消</button><button class="lobbyBtn" id="startGameBtn" style="display:none;">开始游戏</button></div><div class="lobbyCenter"><h3>房间列表</h3><div id="roomList"></div></div><div class="lobbyRight"><h3>当前房间</h3><div class="playerList" id="lobbyPlayerList"></div><h3 style="margin-top:20px;">聊天</h3><div class="chatBox" id="chatBox"></div><div class="chatInputRow"><input type="text" class="chatInput" id="chatInput" placeholder="输入消息..."><button class="chatSendBtn" id="chatSend">发送</button></div></div></div><div class="connectionStatus" id="connectionStatus">未连接</div></div>
+<div id="heroGallery" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; z-index:2000; background:rgba(10,10,10,0.95); overflow-y:auto; padding:20px;"><div style="max-width:900px; margin:0 auto;"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;"><h2 style="color:#d4a843; font-family:SimSun,KaiTi,serif; font-size:28px;">英雄图鉴</h2><button onclick="document.getElementById('heroGallery').style.display='none'; document.getElementById('mainMenu').style.display='block';" style="padding:8px 20px; background:rgba(212,168,67,0.2); border:1px solid #d4a843; color:#d4a843; border-radius:4px; cursor:pointer; font-size:14px;">返回</button></div><div id="heroGalleryGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:15px;"></div></div></div>
+<div id="settingsPanel" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; z-index:2000; background:rgba(10,10,10,0.95); display:flex; align-items:center; justify-content:center;"><div style="width:500px; padding:40px; background:rgba(20,10,5,0.92); border:2px solid #d4a843; border-radius:8px;"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;"><h2 style="color:#d4a843; font-family:SimSun,KaiTi,serif; font-size:24px;">游戏设置</h2><button onclick="document.getElementById('settingsPanel').style.display='none'; document.getElementById('mainMenu').style.display='block';" style="padding:8px 20px; background:rgba(212,168,67,0.2); border:1px solid #d4a843; color:#d4a843; border-radius:4px; cursor:pointer; font-size:14px;">返回</button></div><div style="margin-bottom:20px;"><label style="color:#f0e6d2; display:block; margin-bottom:8px;">音效音量</label><input type="range" id="sfxVolume" min="0" max="100" value="70" style="width:100%; accent-color:#d4a843;"></div><div style="margin-bottom:20px;"><label style="color:#f0e6d2; display:block; margin-bottom:8px;">背景音乐</label><input type="range" id="bgmVolume" min="0" max="100" value="50" style="width:100%; accent-color:#d4a843;"></div><div style="margin-bottom:20px;"><label style="color:#f0e6d2; display:block; margin-bottom:8px;">画质设置</label><select id="qualitySetting" style="width:100%; padding:10px; background:rgba(60,40,20,0.6); border:1px solid #8b6914; color:#f0e6d2; border-radius:4px;"><option value="low">低画质</option><option value="medium" selected>中画质</option><option value="high">高画质</option></select></div><div style="margin-bottom:20px;"><label style="color:#f0e6d2; display:block; margin-bottom:8px;">视角灵敏度</label><input type="range" id="sensitivity" min="1" max="10" value="5" style="width:100%; accent-color:#d4a843;"></div><div style="display:flex; gap:15px;"><label style="color:#f0e6d2; display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" id="showKeyHints" checked> 显示按键提示</label><label style="color:#f0e6d2; display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" id="showMinimap" checked> 显示小地图</label></div></div></div>
+<div id="helpPanel" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; z-index:2000; background:rgba(10,10,10,0.95); overflow-y:auto; padding:20px;"><div style="max-width:800px; margin:0 auto;"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;"><h2 style="color:#d4a843; font-family:SimSun,KaiTi,serif; font-size:28px;">操作指南</h2><button onclick="document.getElementById('helpPanel').style.display='none'; document.getElementById('mainMenu').style.display='block';" style="padding:8px 20px; background:rgba(212,168,67,0.2); border:1px solid #d4a843; color:#d4a843; border-radius:4px; cursor:pointer; font-size:14px;">返回</button></div><div style="color:#f0e6d2; line-height:2;"><h3 style="color:#d4a843; margin:15px 0 10px;">移动操作</h3><div style="background:rgba(60,40,20,0.4); padding:15px; border-radius:6px; margin-bottom:10px;"><div><span style="color:#ffd700; font-weight:bold;">W/A/S/D</span> — 上下左右移动</div><div><span style="color:#ffd700; font-weight:bold;">鼠标左键</span> — 点击地面移动到目标位置 / 普通攻击</div><div><span style="color:#ffd700; font-weight:bold;">空格</span> — 跳跃</div><div><span style="color:#ffd700; font-weight:bold;">Shift</span> — 加速跑</div></div><h3 style="color:#d4a843; margin:15px 0 10px;">战斗操作</h3><div style="background:rgba(60,40,20,0.4); padding:15px; border-radius:6px; margin-bottom:10px;"><div><span style="color:#ffd700; font-weight:bold;">鼠标左键</span> — 普通攻击</div><div><span style="color:#ffd700; font-weight:bold;">1/2/3/4</span> — 释放技能</div></div><h3 style="color:#d4a843; margin:15px 0 10px;">功能操作</h3><div style="background:rgba(60,40,20,0.4); padding:15px; border-radius:6px; margin-bottom:10px;"><div><span style="color:#ffd700; font-weight:bold;">E</span> — 回城</div><div><span style="color:#ffd700; font-weight:bold;">B</span> — 打开商店</div><div><span style="color:#ffd700; font-weight:bold;">Tab</span> — 战绩</div><div><span style="color:#ffd700; font-weight:bold;">ESC</span> — 暂停</div><div><span style="color:#ffd700; font-weight:bold;">L</span> — 锁定/解锁视角</div><div><span style="color:#ffd700; font-weight:bold;">M</span> — 大地图</div><div><span style="color:#ffd700; font-weight:bold;">H</span> — 显示/隐藏按键提示</div></div></div></div></div>
+<div id="gameHUD"><div class="hpMpBars"><div class="barContainer"><span class="barLabel">生命</span><div class="barBg hpBar"><div class="hpFill" id="hpFill" style="width:100%"></div></div><span class="barText" id="hpText">1000/1000</span></div><div class="barContainer"><span class="barLabel">内力</span><div class="barBg mpBar"><div class="mpFill" id="mpFill" style="width:100%"></div></div><span class="barText" id="mpText">500/500</span></div><div class="xpBar"><div class="xpFill" id="xpFill" style="width:0%"></div></div></div><div class="skillBar" id="skillBar"><div class="skillSlot active" data-key="1"><canvas class="skillIcon" id="skill1" width="50" height="50"></canvas><div class="cooldown" id="cd1" style="display:none">0</div><span class="keyHint">1</span></div><div class="skillSlot active" data-key="2"><canvas class="skillIcon" id="skill2" width="50" height="50"></canvas><div class="cooldown" id="cd2" style="display:none">0</div><span class="keyHint">2</span></div><div class="skillSlot active" data-key="3"><canvas class="skillIcon" id="skill3" width="50" height="50"></canvas><div class="cooldown" id="cd3" style="display:none">0</div><span class="keyHint">3</span></div><div class="skillSlot active" data-key="4"><canvas class="skillIcon" id="skill4" width="50" height="50"></canvas><div class="cooldown" id="cd4" style="display:none">0</div><span class="keyHint">4</span></div></div><div class="equipBar" id="equipBar"><div class="equipSlot"></div><div class="equipSlot"></div><div class="equipSlot"></div><div class="equipSlot"></div><div class="equipSlot"></div><div class="equipSlot"></div></div><div class="minimap"><canvas id="minimapCanvas" width="200" height="200"></canvas></div><div class="killFeed" id="killFeed"></div><div class="lockHint" id="lockHint"></div><div class="hintText" id="hintText"></div><div id="keyHintPanel"><div class="keyHintToggle" onclick="toggleKeyHints()">[隐藏]</div><div class="keyHintTitle">按键指南</div><div class="keyHintRow"><span class="keyHintKey">W/A/S/D</span><span class="keyHintDesc">移动</span></div><div class="keyHintRow"><span class="keyHintKey">鼠标左键</span><span class="keyHintDesc">移动/攻击</span></div><div class="keyHintRow"><span class="keyHintKey">空格</span><span class="keyHintDesc">跳跃</span></div><div class="keyHintRow"><span class="keyHintKey">Shift</span><span class="keyHintDesc">加速</span></div><div class="keyHintRow"><span class="keyHintKey">1/2/3/4</span><span class="keyHintDesc">技能</span></div><div class="keyHintRow"><span class="keyHintKey">E</span><span class="keyHintDesc">回城</span></div><div class="keyHintRow"><span class="keyHintKey">B</span><span class="keyHintDesc">商店</span></div><div class="keyHintRow"><span class="keyHintKey">Tab</span><span class="keyHintDesc">战绩</span></div><div class="keyHintRow"><span class="keyHintKey">ESC</span><span class="keyHintDesc">暂停</span></div><div class="keyHintRow"><span class="keyHintKey">L</span><span class="keyHintDesc">锁定视角</span></div><div class="keyHintRow"><span class="keyHintKey">M</span><span class="keyHintDesc">大地图</span></div></div><div id="playerGold">金币: 0</div><div id="respawnCountdown">复活倒计时: 5秒</div></div>
+<div id="scoreboard"><div class="scoreTitle">战绩榜</div><table class="scoreTable"><thead><tr><th>英杰</th><th>击杀</th><th>阵亡</th><th>助攻</th><th>金币</th></tr></thead><tbody id="scoreBody"></tbody></table></div>
+<div id="bigMap"><canvas id="bigMapCanvas" width="600" height="600"></canvas></div>
+<div id="pauseMenu"><div class="pausePanel"><div class="pauseTitle">游戏暂停</div><button class="pauseBtn" id="resumeBtn">继续游戏</button><button class="pauseBtn" id="settingsBtn2">游戏设置</button><button class="pauseBtn" id="quitBtn">退出本局</button></div></div>
+<div id="loadingScreen"><div class="loadingTitle">正在进入战场...</div><div class="loadingBarContainer"><div class="loadingBar" id="loadingBar"></div></div><div class="loadingText" id="loadingText">加载资源中...</div></div>
+<div id="tutorialOverlay"><div class="tutorialBox" id="tutorialBox"><h3 id="tutorialTitle">欢迎来到华夏英杰传</h3><p id="tutorialContent">这是您的第一个战场。</p><button class="tutorialBtn" id="tutorialBtn">下一步</button></div><div class="tutorialHighlight" id="tutorialHighlight" style="display:none;"></div></div>
+<div id="recallBarContainer"><div id="recallBarFill"></div><div id="recallBarText">回城中...</div></div>
+<div id="shopPanel"><div class="shopTitle">装备商店</div><div class="shopGold" id="shopGold">金币: 0</div><div id="shopItemsContainer"></div><button class="shopCloseBtn" id="shopCloseBtn">关闭商店</button></div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>
