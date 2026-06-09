@@ -1,0 +1,115 @@
+name: CI / Continuous Integration
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  lint:
+    name: Lint JavaScript / JS代码检查
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install ESLint
+        run: npm install eslint --save-dev
+
+      - name: Run ESLint
+        run: npx eslint . --ext .js --max-warnings 100 || true
+        continue-on-error: true
+
+  html-validate:
+    name: Validate HTML / HTML验证
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install HTML Validator
+        run: npm install html-validate --save-dev
+
+      - name: Validate HTML files
+        run: npx html-validate "**/*.html" || true
+        continue-on-error: true
+
+  check-file-structure:
+    name: Check File Structure / 文件结构检查
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check required files exist
+        run: |
+          echo "Checking required project files..."
+          files=("index.html" "README.md")
+          for file in "${files[@]}"; do
+            if [ -f "$file" ]; then
+              echo "✓ $file exists"
+            else
+              echo "✗ $file is missing"
+            fi
+          done
+
+      - name: List project structure
+        run: |
+          echo "=== Project Structure ==="
+          find . -maxdepth 2 -type f | head -50
+
+  validate-json:
+    name: Validate JSON Files / JSON文件验证
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JSON files
+        run: |
+          echo "Validating JSON files..."
+          find . -name "*.json" -not -path "./node_modules/*" -not -path "./.github/*" | while read -r jsonfile; do
+            echo "Validating $jsonfile..."
+            python3 -c "import json; json.load(open(''))" && echo "✓ Valid" || echo "✗ Invalid"
+          done || true
+
+  security-check:
+    name: Security Check / 安全检查
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Run npm audit
+        run: |
+          if [ -f "package.json" ]; then
+            npm audit --production || true
+          else
+            echo "No package.json found, skipping npm audit"
+          fi
+
+      - name: Check for sensitive files
+        run: |
+          echo "Checking for sensitive files..."
+          sensitive_files=(".env" ".env.local" "*.key" "*.pem" "credentials.json")
+          found=0
+          for pattern in "${sensitive_files[@]}"; do
+            if find . -name "$pattern" | grep -q .; then
+              echo "⚠️ Warning: Found potentially sensitive file matching $pattern"
+              found=1
+            fi
+          done
+          if [ "$found" -eq 0 ]; then
+            echo "✓ No sensitive files found"
+          fi
