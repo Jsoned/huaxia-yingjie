@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Community Discussion / 社区讨论
+    url: https://github.com/Jsoned/huaxia-yingjie/issues
+    about: General discussion about the project / 关于项目的常规讨论
+  - name: Ask a Question / 提问
+    url: https://github.com/Jsoned/huaxia-yingjie/issues
+    about: Ask questions about the game / 关于游戏的提问
