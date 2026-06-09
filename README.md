@@ -20,6 +20,29 @@
 
 ---
 
+## 📸 游戏截图 / Screenshots
+
+<div align="center">
+
+### 英雄图鉴 / Heroes Gallery
+<img src="screenshots/heroes-gallery.png" width="80%" alt="英雄图鉴" />
+
+### 英雄详情 / Hero Detail
+<img src="screenshots/hero-detail.png" width="80%" alt="英雄详情" />
+
+### 战场选择 / Map Selection
+<img src="screenshots/map-select.png" width="80%" alt="战场选择" />
+
+### 游戏画面 / Gameplay
+<img src="screenshots/gameplay.png" width="80%" alt="游戏画面" />
+
+### 操作指南 / Controls
+<img src="screenshots/controls-guide.png" width="80%" alt="操作指南" />
+
+</div>
+
+---
+
 ## 🚀 在线试玩 / Play Online
 
 > ⚠️ **提示**：由于GitHub Pages在国内访问不稳定，推荐以下方式运行游戏
