@@ -13,11 +13,32 @@
 </p>
 
 <p>
-  <a href="https://jsoned.github.io/huaxia-yingjie/" target="_blank"><b>🌍 国际访问 / International</b></a> |
-  <a href="https://jsoned.gitee.io/huaxia-yingjie/" target="_blank"><b>🇨🇳 国内访问 / China</b></a>
+  <a href="https://github.com/Jsoned/huaxia-yingjie" target="_blank"><b>📦 GitHub仓库</b></a>
 </p>
 
 </div>
+
+---
+
+## 🚀 在线试玩 / Play Online
+
+> ⚠️ **提示**：由于GitHub Pages在国内访问不稳定，推荐以下方式运行游戏
+
+### 方式1：本地下载运行（推荐 / Recommended）
+
+```bash
+# 1. 下载本仓库所有文件
+# 2. 双击打开 index.html 即可游玩
+# 或启动本地服务器：
+python -m http.server 8080
+# 访问 http://localhost:8080
+```
+
+### 方式2：在线预览（需科学上网 / Need VPN）
+- 🔗 GitHub Pages: https://jsoned.github.io/huaxia-yingjie/
+
+### 方式3：复制到国内平台
+- 将 `index.html` 和 `game.js` 上传到 **Gitee**、**Coding** 或 **阿里云OSS** 即可获得国内高速访问
 
 ---
 
@@ -31,61 +52,32 @@
 
 | 特色 / Feature | 描述 / Description |
 |---------------|-------------------|
-| 🏛️ **50位历史英雄** / 50 Heroes | 秦始皇、关羽、诸葛亮、李白、花木兰等 / Qin Shi Huang, Guan Yu, Zhuge Liang, Li Bai, Hua Mulan |
-| ⚔️ **8种英雄职业** / 8 Classes | 皇帝、武将、谋士、美人、刺客、名医、工匠、诗人 / Emperor, Warrior, Strategist, Beauty, Assassin, Doctor, Craftsman, Poet |
-| 🗺️ **三路MOBA战场** / Three Lanes | 上路、中路、下路，防御塔、水晶、兵线系统 / Top, Mid, Bot lanes with towers, crystals, minions |
-| 🛡️ **装备商店系统** / Item Shop | 基地购买装备，属性叠加，策略搭配 / Buy items at base, stat stacking, strategic builds |
-| 🤖 **4级难度AI** / 4 Difficulties | 简单/普通/困难/噩梦，AI智能逐级提升 / Easy/Normal/Hard/Nightmare with scaling AI |
-| 👥 **3v3 / 5v5 模式** / 3v3 / 5v5 Modes | 灵活选择对战规模 / Flexible team sizes |
-| ✨ **独特技能特效** / Unique Skills | 每位英雄4个技能，各有独特Three.js动画效果 / 4 skills per hero with unique Three.js effects |
-| 🧠 **智能AI系统** / Smart AI | 友方和敌方AI会巡逻、攻击、回城、购买装备 / AI patrols, attacks, recalls, and buys items |
-
----
-
-## 🚀 在线试玩 / Play Online
-
-<div align="center">
-
-| 🌍 国际 / International | 🇨🇳 国内 / China |
-|------------------------|----------------|
-| **[GitHub Pages](https://jsoned.github.io/huaxia-yingjie/)** | **[Gitee Pages](https://jsoned.gitee.io/huaxia-yingjie/)** |
-| 全球访问 / Global Access | 国内加速 / China Accelerated |
-
-</div>
-
-### 本地部署 / Local Deployment
-
-```bash
-# 克隆仓库 / Clone repo
-git clone https://github.com/Jsoned/huaxia-yingjie.git
-
-# 进入目录 / Enter directory
-cd huaxia-yingjie
-
-# 启动本地服务器 / Start local server
-python -m http.server 8080
-
-# 浏览器访问 / Browser access
-# http://localhost:8080
-```
+| 🏛️ **50位历史英雄** / 50 Heroes | 秦始皇、关羽、诸葛亮、李白、花木兰等 |
+| ⚔️ **8种英雄职业** / 8 Classes | 皇帝、武将、谋士、美人、刺客、名医、工匠、诗人 |
+| 🗺️ **三路MOBA战场** / Three Lanes | 上路、中路、下路，防御塔、水晶、兵线系统 |
+| 🛡️ **装备商店系统** / Item Shop | 基地购买装备，属性叠加，策略搭配 |
+| 🤖 **4级难度AI** / 4 Difficulties | 简单/普通/困难/噩梦，AI智能逐级提升 |
+| 👥 **3v3 / 5v5 模式** / 3v3 / 5v5 Modes | 灵活选择对战规模 |
+| ✨ **独特技能特效** / Unique Skills | 每位英雄4个技能，各有独特Three.js动画效果 |
+| 🧠 **智能AI系统** / Smart AI | 友方和敌方AI会巡逻、攻击、回城、购买装备 |
 
 ---
 
 ## 🎮 操作指南 / Controls
 
-| 按键 / Key | 功能 / Function | 说明 / Description |
-|-----------|----------------|-------------------|
-| `W/A/S/D` | 移动 / Move | 控制英雄移动 |
-| `鼠标左键` / `Left Click` | 普攻 / Attack | 点击敌人进行普通攻击 |
-| `1/2/3/4` | 技能 / Skills | 释放4个独特技能 |
-| `Shift` | 加速 / Sprint | 加速移动 |
-| `E` | 回城 / Recall | 4秒读条回城恢复（可打断） |
-| `B` | 商店 / Shop | 打开装备商店（需在基地附近） |
-| `L` | 视角 / Camera | 锁定/解锁视角 |
-| `Tab` | 战绩 / Scoreboard | 查看战斗统计 |
-| `M` | 地图 / Map | 打开/关闭大地图 |
-| `H` | 帮助 / Help | 显示/隐藏按键提示 |
-| `ESC` | 暂停 / Pause | 打开暂停菜单 |
+| 按键 / Key | 功能 / Function |
+|-----------|----------------|
+| `W/A/S/D` | 移动 / Move |
+| `鼠标左键` / `Left Click` | 普攻 / Attack |
+| `1/2/3/4` | 技能 / Skills |
+| `Shift` | 加速 / Sprint |
+| `E` | 回城 / Recall |
+| `B` | 商店 / Shop |
+| `L` | 视角 / Camera |
+| `Tab` | 战绩 / Scoreboard |
+| `M` | 地图 / Map |
+| `H` | 帮助 / Help |
+| `ESC` | 暂停 / Pause |
 
 ---
 
@@ -148,11 +140,10 @@ python -m http.server 8080
 
 ## 🛠️ 技术栈 / Tech Stack
 
-- **Three.js** - 3D渲染引擎 / 3D Rendering Engine
-- **HTML5 Canvas** - 2D UI绘制 / 2D UI Drawing
-- **Web Audio API** - 音效系统 / Sound Effects
-- **WebSocket** - 联机对战（开发中）/ Multiplayer (In Development)
-- **LocalStorage** - 本地数据存储 / Local Data Storage
+- **Three.js** - 3D渲染引擎
+- **HTML5 Canvas** - 2D UI绘制
+- **Web Audio API** - 音效系统
+- **LocalStorage** - 本地数据存储
 
 ---
 
@@ -160,42 +151,46 @@ python -m http.server 8080
 
 ```
 huaxia-yingjie/
-├── index.html              # 主游戏文件 / Main game file
-├── game.js                 # 游戏逻辑 / Game logic
-├── README.md               # 项目说明 / Project readme
-├── HOW_TO_PLAY.md          # 玩法指南 / Gameplay guide
-└── docs/                   # 设计文档 / Design docs
+├── index.html              # 主游戏文件
+├── game.js                 # 游戏逻辑
+├── README.md               # 项目说明
+└── package.json            # 项目配置
 ```
+
+---
+
+## 🚀 部署到自己的服务器 / Deploy
+
+### 方式1：Vercel（免费 / Free）
+```bash
+npm i -g vercel
+vercel --prod
+```
+
+### 方式2：Netlify（免费 / Free）
+```bash
+npm i -g netlify-cli
+netlify deploy --prod
+```
+
+### 方式3：Gitee Pages（国内 / China）
+1. 注册 [gitee.com](https://gitee.com)
+2. 导入GitHub仓库
+3. 开启Gitee Pages服务
 
 ---
 
 ## 📝 更新日志 / Changelog
 
 ### v1.0.0 (2025-01)
-- ✅ 50位英雄完整上线 / 50 Heroes Released
-- ✅ 三路MOBA战场系统 / Three-lane MOBA System
-- ✅ 装备商店系统 / Item Shop System
-- ✅ 4级难度AI / 4 Difficulty Levels
-- ✅ 3v3 / 5v5 对战模式 / 3v3 / 5v5 Modes
-- ✅ 独特技能特效系统 / Unique Skill Effects
+- ✅ 50位英雄完整上线
+- ✅ 三路MOBA战场系统
+- ✅ 装备商店系统
+- ✅ 4级难度AI
+- ✅ 3v3 / 5v5 对战模式
+- ✅ 独特技能特效系统
 
 ---
-
-## 🗺️ 开发计划 / Roadmap
-
-- [ ] 联机对战系统完善 / Multiplayer System
-- [ ] 更多地图场景 / More Maps
-- [ ] 排位赛系统 / Ranked Matches
-- [ ] 英雄皮肤系统 / Hero Skins
-- [ ] 移动端适配 / Mobile Support
-
----
-
-## 🤝 贡献指南 / Contributing
-
-欢迎提交Issue和Pull Request！
-
-Welcome to submit Issues and Pull Requests!
 
 ## 📄 许可证 / License
 
@@ -204,8 +199,6 @@ MIT License
 ---
 
 <div align="center">
-
-### 🎮 [立即试玩 / Play Now](https://jsoned.github.io/huaxia-yingjie/)
 
 **华夏英杰传 - 传承千年英雄梦**
 
