@@ -4,7 +4,7 @@
 - [https://chinahero.netlify.app](https://chinahero.netlify.app)
 
 > 如果链接失效，可以通过以下方式部署：
-> 1. 点击 [Deploy to Netlify](https://app.netlify.com/start/deploy?repository=https://github.com/Jsoned/huaxia-yingjie)
+> 1. 点击 [Deploy to Netlify](https://app.netlify.com/start/deploy?repository=https://github.com/Jsoned/chinahero)
 > 2. 用GitHub账号登录
 > 3. 自动部署，获得自己的访问地址
 
@@ -25,7 +25,7 @@
 </p>
 
 <p>
-  <a href="https://github.com/Jsoned/huaxia-yingjie" target="_blank"><b>📦 GitHub仓库</b></a>
+  <a href="https://github.com/Jsoned/chinahero" target="_blank"><b>📦 GitHub仓库</b></a>
 </p>
 
 </div>
