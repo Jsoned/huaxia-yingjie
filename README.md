@@ -1,3 +1,15 @@
+## 🌐 在线试玩
+
+**国内快速访问地址：**
+- [https://kaleidoscopic-wisp-555f8b.netlify.app](https://kaleidoscopic-wisp-555f8b.netlify.app)
+
+> 如果链接失效，可以通过以下方式部署：
+> 1. 点击 [Deploy to Netlify](https://app.netlify.com/start/deploy?repository=https://github.com/Jsoned/huaxia-yingjie)
+> 2. 用GitHub账号登录
+> 3. 自动部署，获得自己的访问地址
+
+---
+
 <div align="center">
 
 # 🎮 华夏英杰传 / Huaxia Yingjie
