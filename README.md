@@ -1,7 +1,7 @@
 ## 🌐 在线试玩
 
 **国内快速访问地址：**
-- [https://kaleidoscopic-wisp-555f8b.netlify.app](https://kaleidoscopic-wisp-555f8b.netlify.app)
+- [https://chinahero.netlify.app](https://chinahero.netlify.app)
 
 > 如果链接失效，可以通过以下方式部署：
 > 1. 点击 [Deploy to Netlify](https://app.netlify.com/start/deploy?repository=https://github.com/Jsoned/huaxia-yingjie)
